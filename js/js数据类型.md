@@ -2,13 +2,13 @@
 
 #### 数据类型
 
-1.  基本类型(值类型)
+1.  基本类型(值类型, 变量存储在栈内存中)
 
 String、Number、Boolean、Null、Undefined、Symbol(es6新增)
 
-2.  引用类型
+2.  引用类型（变量存储在堆内存和栈内存中，栈内存中存储变量的标识符和指向堆内存中该对象的指针即堆内存中该对象的地址），引用类型的值是按引用访问的
 
-Obejct、Function、Array
+Obejct、Function、Array、RegExp、Date
 
 
 
@@ -83,11 +83,18 @@ console.log([1,3,4] instanceof Array) //true
 
 
 3. 在继承关系中，判断一个实例是否属于它的父类型
+function Aoo(){}
 function Foo(){} 
 Foo.prototype = new Aoo();
 var foo = new Foo(); 
 console.log(Foo instanceof Function);//true
 console.log(foo instanceof Foo)//true 
 console.log(foo instanceof Aoo)//true
+
+4. 判断数组对象类型
+(1) instanceof
+(2) isPrototypeOf:   Array.isPrototypeOf(()|[])
+(3) constructor:  []|().constructor = Array
+(4) isArray
 ```
 
