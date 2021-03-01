@@ -1,16 +1,16 @@
 [TOC]
 
+js中的继承是基于原型的
+
 #### 原型链继承
 
 >更改原型对象的指向实现继承
 
 ```javascript
 function Film(name) {
-  this.name = name;
+  this.name = '你好，李焕英!';
 }
-Film.prototype.getCategoty = () => {
-  return '国产电影';
-}
+Film.prototype.getName = () => this.name;
 
 function Comedy() {
   this.type = '喜剧片';
@@ -23,16 +23,14 @@ Comedy.prototype = new Film();
 // 3.将构造函数的作用域赋值给新对象 （也就是this指向新对象）
 // 4.执行构造函数中的代码（为这个新对象添加属性）
 // 5.返回新的对象
-
-Comedy.prototype.getName = () => {
-  return '你好，李焕英!';
-}
+Comedy.prototype.constructor = Comedy;
+Comedy.prototype.getType = () => this.type;
 const comedy = new Comedy();
 console.log(comedy.type);  // '喜剧片'
-console.log(comedy.getCategoty());   // '国产电影'
+console.log(comedy.getName());   // '你好，李焕英!'
 console.log(comedy instanceof Comedy); // true 
 console.log(comedy instanceof Film); // true
-console.log(comedy instanceof Object); // true, js中所有类型都继承Object构造函数的原型（即原型链的顶端）
+console.log(comedy instanceof Object); // true, js中所有类型都继承原型链顶端Object的实例
 ```
 
 优点：
@@ -58,8 +56,8 @@ function Comedy(name, type) {
   Film.apply(this, name);
   this.type = type;
 }
-const comedy = new Comedy('电影', '喜剧片');
-console.log(comedy.name);  // '电影'
+const comedy = new Comedy('你好，李焕英!', '喜剧片');
+console.log(comedy.name);  // '你好，李焕英!'
 console.log(comedy instanceof Comedy); // true 
 console.log(comedy instanceof Film); // false
 ```
@@ -87,7 +85,8 @@ function Comedy(name, type) {
   this.type = type;
 }
 Comedy.prototype = new Film();
-const comedy = new Comedy('电影', '喜剧片');
+Comedy.prototype.constructor = Comedy;
+const comedy = new Comedy('你好，李焕英!', '喜剧片');
 console.log(comedy instanceof Comedy); // true 
 console.log(comedy instanceof Film); // true
 ```
@@ -153,7 +152,7 @@ function Comedy(name, type) {
     Foo.prototype = Film.prototype;
     Comedy.prototype = new Foo();
 })()
-const comedy = new Comedy('电影', '喜剧片');
+const comedy = new Comedy('你好，李焕英!', '喜剧片');
 console.log(comedy instanceof Comedy); // true 
 console.log(comedy instanceof Film); // true
 ```
@@ -163,3 +162,42 @@ console.log(comedy instanceof Film); // true
 
 
 #### ES6类继承
+
+>使用extends关键字，实现构造函数+原型的继承方式同等的效果
+
+```javascript
+class Film {
+    constructor(name) {
+        this.name = name;
+    }
+    getName() {
+        console.log(this.name);
+    }
+}
+console.log(typeof Film); // 'function', 类声明只是自定义的类型创建的语法糖
+
+//ES5模拟类的实现(也称为自定义的类型创建)
+function Film(name) {
+    this.name = name;
+}
+Film.prototype.getName = () => this.name;
+
+
+class Comedy extends Film {
+    constructor(type) {
+        super(name); // 等同于Film.call(this, name);
+        this.type = type;
+    }
+    getType() {
+        console.log(this.type);
+    }
+    getName() {
+        super.getName(); // '你好，李焕英!', 调用父类被覆盖的方法
+        console.log('重写父类方法');
+    }
+}
+const comedy = new Comedy('你好，李焕英!', '喜剧片');
+console.log(comedy instanceof Comedy); // true 
+console.log(comedy instanceof Film); // true
+```
+
