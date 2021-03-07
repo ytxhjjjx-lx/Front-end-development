@@ -1,8 +1,8 @@
 [TOC]
 
-js中的继承是基于原型的
+js中的继承方式
 
-#### 原型链继承
+#### 1. 原型链继承
 
 >更改原型对象的指向实现继承
 
@@ -46,7 +46,7 @@ console.log(comedy instanceof Object); // true, js中所有类型都继承原型
 
 
 
-#### 构造函数继承
+#### 2. 构造函数继承
 
 > 借调父类构造函数实现继承
 
@@ -74,7 +74,7 @@ console.log(comedy instanceof Film); // false
 
 
 
-#### 组合继承（常用）
+#### 3. 组合继承（常用）
 
 >结合原型链继承和构造函数继承
 
@@ -102,7 +102,7 @@ console.log(comedy instanceof Film); // true
 
 
 
-#### 原型式继承
+#### 4. 原型式继承
 
 >借助原型基于已有的对象创建新对象（相当于浅拷贝）
 
@@ -136,7 +136,7 @@ console.log(comedy2.types); // ['喜剧片'， '动作片'， '爱情片', '战�
 
 
 
-#### 寄生组合式继承
+#### 5. 寄生组合式继承
 
 >解决组合继承两次调用父类的问题
 
@@ -161,7 +161,7 @@ console.log(comedy instanceof Film); // true
 
 
 
-#### ES6类继承
+#### 6. ES6类继承
 
 >使用extends关键字，实现构造函数+原型的继承方式同等的效果
 
@@ -200,4 +200,112 @@ const comedy = new Comedy('你好，李焕英!', '喜剧片');
 console.log(comedy instanceof Comedy); // true 
 console.log(comedy instanceof Film); // true
 ```
+
+
+
+#### 继承与原型链
+
+js对象包含一个__proto__属性，大部分浏览器不支持访问，操作不慎会改变这个对象的继承原型链
+
+使用Object.getPrototypeOf获取
+
+
+
+(1) 基于原型链的继承:
+
+```javascript
+/** 继承属性 **/
+let f = function() {
+   this.a = 1;
+   this.b = 2;
+}
+let o = new f();
+f.prototype.b = 3;
+f.prototype.c = 4;
+
+原型链如下: 如控制台打印结果
+// {a:1, b:2} ---> {b:3, c:4} ---> Object.prototype ---> null
+console.log(o.a);  // 1
+console.log(o.b);  // 2
+console.log(o.c);  // 4
+console.log(o.d);  // undefined
+
+/** 继承方法 **/
+const o = {
+  a: 2,
+  m: () => this.a + 1;
+};
+const p = Object.create(o);
+p.a = 4;
+console.log(o.m()); // 3
+console.log(p.m()); // 5, 当继承的函数被调用时，this 指向的是当前继承的对象
+```
+
+(2) 生成原型链的不同方式
+
+1. 使用语法结构创建的对象:
+
+```javascript
+var a = ["yo", "whadup", "?"];
+// 数组都继承于 Array.prototype
+// (Array.prototype 中包含 indexOf, map 等方法)
+// 原型链:
+// a ---> Array.prototype ---> Object.prototype ---> null
+```
+
+2. 使用构造器创建的对象:
+
+```javascript
+function Graph() {
+  this.vertices = [];
+  this.edges = [];
+}
+Graph.prototype = {
+  addVertex: function(v){
+    this.vertices.push(v);
+  }
+};
+const g = new Graph();
+// 原型链:
+// g ---> Graph.prototype ---> Object.prototype ---> null
+```
+
+3. Object.create()创建的对象
+
+```javascript
+var a = {a: 1};
+// a ---> Object.prototype ---> null
+var b = Object.create(a);
+// b ---> a ---> Object.prototype ---> null
+var c = Object.create(b);
+// c ---> b ---> a ---> Object.prototype ---> null
+var d = Object.create(null);
+// d ---> null
+```
+
+总结：
+
+原型链查找属性比较消耗性能，查找不存在的属性时会遍历整个原型链，应避免这样的操作
+
+```javascript
+if(!g.hasOwnProperty(addVertex)) {
+   不执行操作
+}
+```
+
+
+
+prototype 和 Object.getPrototypeOf()
+
+>`prototype` 是用于类的，而 `Object.getPrototypeOf()` 是用于实例的（instances），两者功能一致
+
+```javascript
+const a1 = new A(); const a2 = new A();
+// Object.getPrototypeOf(a1).doSomething == Object.getPrototypeOf(a2).doSomething == A.prototype.doSomething
+// a1.doSomething() 相当于执行 Object.getPrototypeOf(a1).doSomething.call(a1) == A.prototype.doSomething.call(a1)）
+```
+
+结论：
+
+**在使用原型继承编写复杂代码之前，理解原型继承模型是至关重要的。此外，请注意代码中原型链的长度，并在必要时将其分解，以避免可能的性能问题。此外，原生原型不应该被扩展，除非它是为了与新的 JavaScript 特性兼容**
 
