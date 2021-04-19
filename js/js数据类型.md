@@ -51,10 +51,11 @@ obj.a = 1,
 obj.b = function() {},
 obj[Symbol('a')] = 2,
 
-Object.getOwnPropertySymbols(obj); //[Symbol(a)]  遍历symbol类型属性名
-Object.getOwnPropertyNames(obj); //['a', 'b', 'getFoo']  遍历非symbol类型属性名（包括不可枚举属性）
-Reflect.ownKeys(obj);  //[Symbol(a), 'a', 'b', 'getFoo']  遍历所有类型属性名，包括不可枚举和symbol类型
-Object.keys(obj); //['a', 'b'] 遍历可枚举属性名
+Object.getOwnPropertySymbols(obj); //[Symbol(a)]  遍历自身symbol类型属性
+Object.getOwnPropertyNames(obj); //['a', 'b', 'getFoo']  遍历自身非symbol类型属性（包括不可枚举属性）
+Reflect.ownKeys(obj);  //[Symbol(a), 'a', 'b', 'getFoo']  遍历自身所有类型属性，包括不可枚举和symbol类型
+Object.keys(obj); //['a', 'b'] 遍历自身可枚举属性， 
+// for...in遍历可枚举属性（包括继承而来的）, 搭配hasOwnProperty使用过滤出自身可枚举属性
 ```
 
 
